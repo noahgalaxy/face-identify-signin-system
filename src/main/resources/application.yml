@@ -28,6 +28,6 @@ spring:
         password: fisheep
 
 mybatis:
-  mapper-locations: classpath:mapper/*.xml
+  mapper-locations: classpath:mapper/**/*.xml
 
 face-image-root-dir: /home/fisheep/code/java/face-signin-backen-test/src/main/resources/upload

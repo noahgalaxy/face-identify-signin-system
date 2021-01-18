@@ -23,6 +23,6 @@
     <select id="getUser" resultMap="userMap">
         select user_id, user_no, user_phone, user_real_name, user_nick_name, user_email, user_depart_id
         from mysql.openlookeng.user_info
-        where user_no=face_scan(#{faceImgPath})
+        where user_no=face_scan_by_imgpath(#{faceImgPath})
     </select>
 </mapper>

@@ -8,9 +8,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
@@ -84,16 +86,22 @@ public class TestSignInService {
     }
 
     @Test
-    public void testFaceSignIn() throws IOException {
+    public void testFaceSignIn() throws IOException, InterruptedException {
         String filePath = "/home/fisheep/Desktop/faceImageLib/宋运辉_gaitubao_256x300.jpg";
         File file = new File(filePath);
         FileInputStream fileInputStream = new FileInputStream(file);
         MultipartFile mockMultipartFile = new MockMultipartFile("自定义名字", "测试saveFile.png","image/jpeg", fileInputStream);
         System.out.println("getOriginalFileName: "+mockMultipartFile.getOriginalFilename());
         System.out.println("getName: "+mockMultipartFile.getName());
-        signInService.saveFile(mockMultipartFile);
-//        User user = signInService.faceSignIn(mockMultipartFile);
-//        System.out.println(user);
+//        User userFromOpenlookeng = signInService.getUserFromOpenlookeng(mockMultipartFile);
+//        System.out.println(userFromOpenlookeng);
+
+        User user = signInService.faceSignIn(mockMultipartFile);
+        System.out.println(user);
+
+
+//        String s = signInService.saveFile(mockMultipartFile);
+//        System.out.println(s);
     }
 
 }

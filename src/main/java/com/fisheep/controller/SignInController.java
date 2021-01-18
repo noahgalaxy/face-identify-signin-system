@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+
 @RestController
 @RequestMapping("signIn")
 public class SignInController {
@@ -28,7 +30,7 @@ public class SignInController {
     private Logger logger = LoggerFactory.getLogger(SignInController.class);
 
     @PostMapping(value = "/face")
-    public RestfulResult faceSignIn(@RequestBody MultipartFile file){
+    public RestfulResult faceSignIn(@RequestBody MultipartFile file) throws InterruptedException {
         if(file.isEmpty()){
             throw new RequestParamException();
         }

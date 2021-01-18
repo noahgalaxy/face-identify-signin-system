@@ -28,7 +28,7 @@ public class DynamicDataSourceAspect {
                 ChooseDataSource annotation = method.getAnnotation(ChooseDataSource.class);
                 String dsName = annotation.value();
                 DataSourceContextHolder.setDs(dsName);
-                logger.info("【"+methodName+"】数据源已经切换到【"+dsName+"】");
+                logger.info("当前线程："+Thread.currentThread().getName()+"【"+methodName+"】数据源已经切换到【"+dsName+"】");
             }
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
@@ -38,6 +38,6 @@ public class DynamicDataSourceAspect {
     @After("@annotation(ChooseDataSource)")
     public void afterMethodCompelete(JoinPoint point){
         DataSourceContextHolder.clear();
-        logger.info("数据源清空");
+        logger.info("当前线程："+Thread.currentThread().getName()+"【数据源清空】");
     }
 }
