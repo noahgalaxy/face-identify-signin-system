@@ -26,12 +26,15 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 
 @Service
 public class SignInService {
-
+    /*
+    - 这里不注入自己的话，后面的faceSignIn方法里面，开两个线程道不同数据源里面去进行查询的时候，
+        会导致aop切面失效，也就是@ChooseDatasource这个注解会失效，解决办法就是在这里注入自己。
+        遇到的循环依赖spring会自己解决；
+     */
     @Autowired
     SignInService signInService;
 
@@ -44,13 +47,10 @@ public class SignInService {
     SignInDao signInDao;
 
     @Autowired
-    UserDao userDao;
-
-    @Autowired
     OpenlookengSignInDao openlookengSignInDao;
 
     @ChooseDataSource(DataSourceConstants.DEFAULT_DATA_SOURCE)
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+//    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public String saveFile(MultipartFile file) throws IOException {
         String originalFilename = file.getOriginalFilename();
         int[] currYearMonthDay = DateUtils.getCurrYearMonthDay();
@@ -111,8 +111,6 @@ public class SignInService {
         String base64String = FileUtils.getBase64String(fileBytes);
         logger.info("当前线程："+Thread.currentThread().getName()+"：base64String长度为： "+base64String.length());
         User user = openlookengSignInDao.getUserFromOpenlookeng(base64String);
-//        User user = userDao.getUser("/home/fisheep/Desktop/faceImageLib/宋运辉_gaitubao_256x300.jpg");
-//        User user = openlookengSignInDao.getUserFromOpenlookeng("/home/fisheep/Desktop/faceImageLib/宋运辉_gaitubao_256x300.jpg");
         return user;
     }
 
@@ -153,7 +151,7 @@ public class SignInService {
         }
     }
 
-    public User faceSignIn(MultipartFile file) throws NoUserException, InterruptedException {
+    public User faceSignIn(MultipartFile file) throws NoUserException {
     /*
         - A线程，保存文件，将文件路径保存到数据表中；
         - B线程，向openlookeng里面查询该人脸图像的userNo，并返回userNo
@@ -172,7 +170,6 @@ public class SignInService {
 
 
         saveFileThread.start();
-        Thread.sleep(1000);
         openlookengThread.start();
 
 //        保存异步任务执行结果
@@ -183,11 +180,10 @@ public class SignInService {
             user = openlookengFutureTask.get();
             saveFileThread.join();
             openlookengThread.join();
-        } catch (InterruptedException e) {
+        } catch (Exception e) {
             e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        } finally {
+        }
+        finally {
 //            确保执行结果成功
             if(filePath == null || user == null || user.getUserNo() == null){
                 throw new NoUserException();

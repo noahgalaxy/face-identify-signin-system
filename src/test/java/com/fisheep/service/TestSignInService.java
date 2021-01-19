@@ -13,6 +13,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
@@ -86,7 +88,7 @@ public class TestSignInService {
     }
 
     @Test
-    public void testFaceSignIn() throws IOException, InterruptedException {
+    public void testFaceSignIn() throws IOException {
         String filePath = "/home/fisheep/Desktop/faceImageLib/宋运辉_gaitubao_256x300.jpg";
         File file = new File(filePath);
         FileInputStream fileInputStream = new FileInputStream(file);
