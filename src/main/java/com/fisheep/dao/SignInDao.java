@@ -13,4 +13,7 @@ public interface SignInDao {
 
     void insertFaceImageToAllFaceImageFileTable(@Param("filePath") String filePath);
 
+    User getUserFromOpenlookeng(@Param("basestring") String base64String);
+
+    int saveUserSignRecord(@Param("filePath") String filePath, User user);
 }

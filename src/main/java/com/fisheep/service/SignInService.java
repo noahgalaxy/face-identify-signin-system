@@ -3,9 +3,8 @@ package com.fisheep.service;
 import com.fisheep.config.ChooseDataSource;
 import com.fisheep.constant.DataSourceConstants;
 import com.fisheep.dao.SignInDao;
-import com.fisheep.dao.UserDao;
-import com.fisheep.dao.openlookeng.OpenlookengSignInDao;
 import com.fisheep.domain.User;
+import com.fisheep.exception.DatabaseInternalException;
 import com.fisheep.exception.NoUserException;
 import com.fisheep.utils.DateUtils;
 import com.fisheep.utils.FileUtils;
@@ -15,8 +14,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.BufferedInputStream;
@@ -46,8 +43,7 @@ public class SignInService {
     @Autowired
     SignInDao signInDao;
 
-    @Autowired
-    OpenlookengSignInDao openlookengSignInDao;
+
 
     @ChooseDataSource(DataSourceConstants.DEFAULT_DATA_SOURCE)
 //    @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -110,7 +106,7 @@ public class SignInService {
         byte[] fileBytes = file.getBytes();
         String base64String = FileUtils.getBase64String(fileBytes);
         logger.info("当前线程："+Thread.currentThread().getName()+"：base64String长度为： "+base64String.length());
-        User user = openlookengSignInDao.getUserFromOpenlookeng(base64String);
+        User user = signInDao.getUserFromOpenlookeng(base64String);
         return user;
     }
 
@@ -190,6 +186,15 @@ public class SignInService {
             }
         }
         logger.info(String.format("文件保存路径%s", filePath));
+        int id = saveUserSignRecord(filePath, user);
+        if(id == 0){
+            throw new DatabaseInternalException();
+        }
         return user;
+    }
+
+    @ChooseDataSource(DataSourceConstants.DEFAULT_DATA_SOURCE)
+    public int saveUserSignRecord(String filePath, User user){
+        return signInDao.saveUserSignRecord(filePath, user);
     }
 }
