@@ -2,7 +2,9 @@ package com.fisheep.controller;
 
 import com.fisheep.constant.HttpStatus;
 import com.fisheep.domain.User;
+import com.fisheep.exception.NoUserException;
 import com.fisheep.exception.RequestParamException;
+import com.fisheep.exception.SignFaildException;
 import com.fisheep.service.SignInService;
 import com.fisheep.service.UserService;
 import com.fisheep.utils.RestfulResult;
@@ -30,16 +32,24 @@ public class SignInController {
     private Logger logger = LoggerFactory.getLogger(SignInController.class);
 
     @PostMapping(value = "/face")
-    public RestfulResult faceSignIn(@RequestBody MultipartFile file) throws InterruptedException {
+    public RestfulResult faceSignIn(@RequestBody MultipartFile file) {
         if(file.isEmpty()){
             throw new RequestParamException();
         }
         String originalFilename = file.getOriginalFilename();
         String fileName = file.getName();
         logger.info(String.format("faceSignIn接口得到上传人脸图片，originalFilename:【%s】，fileName：【%s】", originalFilename, fileName));
-        User user = signInService.faceSignIn(file);
+        User user = null;
+        try{
+            user = signInService.faceSignIn(file);
+        }catch (NoUserException e){
+            throw e;
+        }catch (SignFaildException e){
+            throw e;
+        }
         return new RestfulResult.Builder(HttpStatus.SUCCESS)
                 .setMsg("人脸签到成功")
+                .setData(user)
                 .build();
     }
     @PostMapping(value = "/facePath")

@@ -17,12 +17,12 @@ spring:
       pool-prepared-statements: true
       max-open-prepared-statements: 20
       openlookeng:
-        url: jdbc:lk://localhost:8080
+        url: jdbc:lk://localhost:8090
         driver-class-name: io.hetu.core.jdbc.OpenLooKengDriver
         username: root
         password:
       mysql:
-        url: jdbc:mysql://localhost:3306?useSSL=false
+        url: jdbc:mysql://localhost:3306?allowPublicKeyRetrieval=true&useSSL=false
         driver-class-name: com.mysql.cj.jdbc.Driver
         username: root
         password: fisheep

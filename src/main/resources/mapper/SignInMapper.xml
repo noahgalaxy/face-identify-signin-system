@@ -3,9 +3,6 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.fisheep.dao.SignInDao">
-    <parameterMap id="" type="">
-
-    </parameterMap>
     <resultMap id="userMap" type="com.fisheep.domain.User">
         <id property="userId" column="user_id"></id>
         <result property="userNo" column="user_no"></result>
@@ -22,11 +19,14 @@
     <select id="getUserFromOpenlookeng" resultMap="userMap">
         select user_id, user_no, user_phone, user_real_name, user_nick_name, user_email, user_depart_id
         from mysql.openlookeng.user_info
-        where user_no=face_scan_by_base64(#{basestring})
+        where user_no=face_search_by_base64(#{basestring})
     </select>
 
-    <insert id="saveUserSignRecord">
-        insert into openlookeng.
+    <insert id="saveUserSignRecord" parameterType="com.fisheep.domain.User">
+        <selectKey keyProperty="id" resultType="java.lang.Integer" order="AFTER" >
+            select last_insert_id();
+        </selectKey>
+        insert into openlookeng.attend_records(user_no, real_name, nick_name, depart_id, face_img_path) values (#{user.userNo}, #{user.userRealName}, #{user.userNickName}, #{user.userDepartId}, #{filePath});
     </insert>
 
 </mapper>

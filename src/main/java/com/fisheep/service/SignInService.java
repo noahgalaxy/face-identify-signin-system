@@ -4,11 +4,10 @@ import com.fisheep.config.ChooseDataSource;
 import com.fisheep.constant.DataSourceConstants;
 import com.fisheep.dao.SignInDao;
 import com.fisheep.domain.User;
-import com.fisheep.exception.DatabaseInternalException;
 import com.fisheep.exception.NoUserException;
+import com.fisheep.exception.SignFaildException;
 import com.fisheep.utils.DateUtils;
 import com.fisheep.utils.FileUtils;
-import io.prestosql.jdbc.$internal.okhttp3.Call;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -143,11 +142,12 @@ public class SignInService {
         public User call() throws Exception {
             //执行openlookeng侧查询，将查询到的userNo返回
             User user = signInService.getUserFromOpenlookeng(this.file);
+            System.out.println("openlookeng查询到的user:" + user);
             return user;
         }
     }
 
-    public User faceSignIn(MultipartFile file) throws NoUserException {
+    public User faceSignIn(MultipartFile file) throws NoUserException, SignFaildException {
     /*
         - A线程，保存文件，将文件路径保存到数据表中；
         - B线程，向openlookeng里面查询该人脸图像的userNo，并返回userNo
@@ -188,7 +188,7 @@ public class SignInService {
         logger.info(String.format("文件保存路径%s", filePath));
         int id = saveUserSignRecord(filePath, user);
         if(id == 0){
-            throw new DatabaseInternalException();
+            throw new SignFaildException();
         }
         return user;
     }
